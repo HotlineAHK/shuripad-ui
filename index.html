@@ -73,6 +73,7 @@ input::placeholder{color:var(--dimmer)}
 .cell{aspect-ratio:1.7;border-radius:10px;display:grid;place-items:center;font:1.15rem var(--mono);color:var(--dim);
   background:var(--panel2);border:1px solid var(--border);transition:all .08s;user-select:none}
 .cell.on{color:#fff;background:var(--blue-soft);border-color:var(--blue);box-shadow:0 0 16px rgba(77,141,255,.45);transform:scale(.95)}
+.cell:hover{border-color:var(--border2);color:var(--text)}
 .live{display:inline-flex;align-items:center;gap:6px;font:.72rem var(--mono);color:var(--dimmer)}
 
 button.primary{width:100%;padding:14px;border:0;border-radius:11px;background:linear-gradient(135deg,#2f6fe0,#4d8dff);color:#fff;font-size:.98rem;font-weight:600;cursor:pointer;margin-top:14px;box-shadow:0 4px 18px rgba(47,111,224,.3);transition:filter .15s,transform .08s}
@@ -104,7 +105,7 @@ button.primary:active{filter:brightness(.85);transform:scale(.985)}
 <div class="card">
   <div class="cardhead"><h2>Тест кнопок</h2><span class="live"><span class="dot" id="livedot"></span><span id="livetext">опрос…</span></span></div>
   <div id="padgrid"></div>
-  <p class="m">Зажми кнопку на паде — ячейка загорится.</p>
+  <p class="m">Зажми физическую кнопку на паде (1–8) — ячейка загорится. Сами ячейки — только индикаторы, мышью не нажимаются.</p>
 </div>
 <div class="card">
   <h2 style="margin-bottom:10px">WiFi (домашняя сеть)</h2>
