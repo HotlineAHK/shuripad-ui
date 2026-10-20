@@ -26,9 +26,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;opacity:.55;transition
 body.typing::before{opacity:1}
 
 header{display:flex;align-items:center;gap:12px}
-.logo{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;
-  background:linear-gradient(135deg,#2f6fe0,#4d8dff);box-shadow:0 4px 18px rgba(77,141,255,.35);
-  font:700 1.15rem var(--mono);color:#fff}
+.logo{width:36px;height:36px;border-radius:10px;box-shadow:0 4px 18px rgba(65,196,99,.3)}
 h1{font-size:1.35rem;margin:0;letter-spacing:.2px}
 h2{font-size:.95rem;margin:0}
 
@@ -36,7 +34,7 @@ h2{font-size:.95rem;margin:0}
 .spin.ok{color:var(--green)}
 
 .facts{margin:12px 0 2px;border:1px solid var(--border);border-radius:12px;background:var(--panel);overflow:hidden}
-.fact{display:grid;grid-template-columns:18px auto 1fr;gap:10px;align-items:center;padding:9px 13px;border-top:1px solid var(--border)}
+.fact{display:grid;grid-template-columns:18px auto 1fr auto;gap:10px;align-items:center;padding:9px 13px;border-top:1px solid var(--border)}
 .facts>.fact:first-child{border-top:0}
 .fact svg{width:15px;height:15px;display:block;color:var(--dimmer)}
 .fact svg.ok{color:var(--green)}
@@ -92,8 +90,8 @@ button.primary:active{filter:brightness(.85);transform:scale(.985)}
 </style>
 </head>
 <body>
-<header><div class="logo">⌗</div><h1>shuri-pad</h1></header>
-<div class="facts"><div class="fact"><span id="spin" class="spin">⠋</span><span class="fl">статус</span><span class="fv" id="stext">подключаюсь к плате…</span></div><div id="facts"></div></div>
+<header><img class="logo" alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAIGNIUk0AAHomAACAhAAA+gAAAIDoAAB1MAAA6mAAADqYAAAXcJy6UTwAAAAGYktHRAD/AP8A/6C9p5MAAAAHdElNRQfqChQHIhRW5871AAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDI2LTEwLTIwVDA3OjMwOjAxKzAwOjAwjdD8HgAAACV0RVh0ZGF0ZTptb2RpZnkAMjAyNi0xMC0yMFQwNzozMDowMSswMDowMPyNRKIAAAAodEVYdGRhdGU6dGltZXN0YW1wADIwMjYtMTAtMjBUMDc6MzQ6MjArMDA6MDBGIcnOAAAa/0lEQVR42p2beYzl2XXXP/f+lre/2pdeqrqW7p5ue4axxx5nvEw8DjHYsQmyCGAbrAihSBgJIZY/AEXRSICMAAkpUpRAEEqMpZDgCJyAHHmLsWMTZjzjHs/S01tVd+17vap662+5lz/O/dV7VfWqHedKPd1Tv1/dc7/fe+45555zforv/ZqlnnJm5D24BpRSWPJhPQVrT77jKZjRMJ7CfgALKUTm7FwTGq4YSBXc13DQR17Bg6tO3rIHaymcEteVl0DNh/tA3Geu0RBmEzD2fHlFDfPg9wUP0ErhkQ+DOdiIzoIHSC0sW7ABbBjoGFB95tqy4AcQWzhI+str9shbj86C75VHDjYSiE3/uXZjCAN5fq48Aw80Gq37v6AVVC1UEyjo/gvKdq5ooUh/8BYIFJQsVA346vHyKgkU1OPlFay8w2PklQ1UUvA4X96Axmfag1VOsqkUXNJwKQXPwrwHDzyopydBDvowY6CYQF4DPuwkJxeT0zCrYDh2P/TgIaIN6ieUNxDArIVi/GeXZ3xYNqI9p/FdTNBciGHKA8/tcu9itJWflVOYt1D2ujtzvJhEfhYamElh1O+zmJ5FjqUwo2SX/lzy4p9M3mQKV4R3rNv5y115PlgYj4FANGFMdRfTy2w5lZ1Z8CCwsvOFpLvA40W5XT6yAnS4zxkcS+WdZfXj5T3wwNcnwf8k8pSFCQtoWFEw4eQpmcg/fmk0gTiEsVjUMBPUq4IlA5MhBAYK8dnnuEVd0FAKYKjT3y4ADBuIeuT1G5k8HyhGfz552dSjCL7xuKtpxwRYBeserMXQcq4mNJAAsbPICiAPDWdYikDaERXuFRb40ATaETQ8IOl6ED8RspUS8K0Y6lbeibSso3foQOT5Fgo+JPFZcL4HdaDt1q47PetVkPNl99c98S6RD9MW/NQRYBWs+bCait/ccbzMKmin8PYqxAmMlWF2VMhRQJTA4hbU2l3WPQUjRRgqwUwRlIalPVg7FBKUFVszMwwTFag4G3DQgvu70E66uzxRgZkRWQdAlMLCFhy0uwQUA7g2BpM5R4iFR/uwfujWE8KNaTj0uvi23HGfBvwUj7/1V15kzT3MRtNA7EFoYXMHqnmYH4GcJ4tTQKChnINaC+oRNJtwsAfrO7CyCfWmEDFWhk4M+01Z4PQQXKwK8GyufACBB3sNIXasDHPDIuNYnoJyCLUmNDqylmujMJDvvqOBSl60odaSH9oR2OIsvjSACnh86mMv9g1ymlZcx2Asi8n7Z31z6MFgEWoN2N5Cq8gMje7H+FGabESK7QNFLoDLwwJ4rAxTQyePzfF5D6EYisrOjcjc9JE3UIDUwOwIDBfPvuMpWZOxMFKCVgFafWxHw0A7wMfY8w2VAXKBWOHzApPQFyNmDBdmau0XPviSv5hoFm/PNTdvT+XMS62Ay2MwOiIAteofVSoHsBB0XfJ58oqhaEC/YZH1FkOJBo/OmcdaiA0+Ixr2zVmBgz6MpLCwLwZtbkTY7V1wbOD+DuzUQSlC2/JyfhRUAtQT737LHxzf7Dy8dTNuLaV5VnY1I6Pw1BSMFk/KU8BBB97egmYkx+DKsJB1Wt69bTnj+y24MS524PTal2uwsAO5ECoDTuNOvTSsYSZFczWFiVMTDAQw5/y8sbBSg8XdbjR1ejHuPJvUzymr1EVgVqEvXd4tPPXCy/7Q3HIDopSdLfjhAmw3usdAIYbt7U2od0Teo314tNc9t6flgdiUt7egGXc12GbgdyGxkBjBNuadBT9rIG/QeIhbmHSCBnz3sCegMFYmzkjoXYy1x2Cy/84AnwN+Ghgvd8KbH/hR4dK7H7QIo4i9XXjpbVjbdx7A7Xy9c1JeLwmnwWejlwSQjXqwIzYiIyUwErSN+rLCDHxOYgGJAzISggBGXHh7+nxaR4KvRUDvYhILxqKNivMSZnhDVPgYLS6T8HXf+P6TbxeLA/vNpVtPpJ1dm+fl24r5S9Cw4kVOj4wE34NOchZ8NvaacG8HRkuy86aP8QhSmLFiYCeSY/AcB0IARyEcWMhbKNA/osr74hIBNusSyCjny5XiKM4nYer5gVbePP+aGl8n4Q8ZA76hrA6nN8qDowedR29cbezcm8qbNxd9/ByUq3Jd7ievnBM3mTsSIk4PX8NQQdxh5pb7GfWmgcMUShpy3Yuf3IVrISy6u/qihR3vJAPWinW+MS6BzkhR/l1wi/Y8UIokCQNS3zMofN7BGH+fgAJDwKeAjwIXi63cxLNvFMdeuNUJRutt0g4c7kLjCEyP6pZzcHNSZE2U4cZEV15mPzwlQdXFqrjRd0z0d40HChYUHBrBt9vdd5/9EB5aaCXO2FhYdNzknJ70gs80LCPh7S3xqVbRiqyOE2U7QEJChQ8yyDtY4xU84H3ACPCbyuqtS2slb/Aw8m5fT+z9C9q0jjRxB/ycEHqhAO0mrDW7x7AA7NdFPeJU3OWjDtxfliCpkpdMVt4XPACHSCCUxQKRgUV3lR5J8I/TWMd3c0fCQ3dTKwZwZegk+ExFMxLubUM7II4CvFbBUu4QY4EKeaZQvAJAxxHwj4DfAr5uy6EpT9nikztxvBQSbVUC4o5CAW8dnPJczpUZC9palIHEoresLH0fUqtB+4pKGSpDMFiCmjoZCPWSkPr4fdNY2Us1C5eGzvrtXhKGChLdHe6Rr3v6OfMevcEtYuScFbiJ4n9i3f0pyz/9A+BakuNLW/Pq+UsjYfn5l6PXHm2Zw7byGknONoKOKegkDaxOUqwaxqoBZb28QqXlZlzIG+8FrtirTOg8ngpQ5v/FB/F/vFNnZ9OWGBuCy4Ny5eYcfCsan4Inl57TwHIaBoGVfbmNjZb6k7ByIO6qGRF6mlnvOocs0XYEaHLHMrXT4hRoAJ8YfMS1536dGf/9PK8+Eq4/uc9vLMOv3ruovBvf0FMX39Dj7t42BsrZZmXBH6fMX+Mik4zhAT6Ky7SDb7XWGzvrVcvKnkLlwZs6a9EzfNMKn2vAogdH6bGWSWZFQxDDagx3toCJs5pwHHTIMbI5mb1FhwPuggOrkBtrQ2ah4txPA5gPW2j+hA22CKhyNFDj2fn7XKusqEkURQJVIU8RCAGNBRpY6rzB/+IuIW8Cd4Ht2EteX33aB6XQvlyaZhWkPem1U5kjn0rSzbwcpd2HIwkcOrStjIRxIcG4oGNhV2ICx2orTbkV32KbbeocHJPtA68B3wF+CvgQUHKAjoAmEQu8QRH4bBVKVc0TvJsiz+ORx6eEOmY+ZomvssYGCW0OaHMPWAb7aPF6p75eKeKFkM+7zJKBioYHGurmTNrMx7pc/Lwn+f9x2yetpBwJm0JCKz4J3oXCsbG8Yu4aTV0fHZ92i0t5YBwJb1nFp5RlChgAIqcNkTsieQJCRok5oMkGbfawtDEoElL22KcN7AE/AjaBw4OB1urrMwGp0pRLkovIdqDSg2/iJL4eh2ghpyQT1C+QUC4p0U7kb9P3umabKOOB3mfl+BetU/sbwILx7O8v/EVeKeyrvzv5Gu/3Ige6Ozp0uMPXSLGk7hhlWBQQAzVgw2nWUeLHC7eesNFhLiRXhHzh7Mo8BaGGXNI9Cs52SDrqoYadGI60sFXuMYzZFXNuBC4OCPjUXZJsN3moFAaNOQCOWAUsCoNyBBSAtFZsx4uX1b3oY/l/O3OFX7j5P3hBp2ThS4xk1GpYOlIC4Ql3ZJQjY9+5928C2yizdOd6p/Zwoki1pCgOSWjeu3GtABYV7EfQ9ARfKXV3gY4Dv+uMRN2IPZj3QCVd9uZGxK2onv+HLgkKrLXpXZJkAMIa68Au0KLmmJ7lKpt1DRs7If5t9tYL/N58jtV8k6cdSA22DXbVaL2qDYkj4Sl3RGqOhG8DfwR2aO1ye+P12Tz5nOY910H5Yq/asfiL2MKyhlokaz9Ku/hKKf6Z2plCLOaCB2NawE73gO9VqYyE5X1QFqPgUMm53uF1Vvk8LZZoA0XG+Bn+Cyv2iyl2BdrrsJ5y+L0nWRrfiwJfKzoqaKeqs9POpXEuKhw+fY+bQaKvOPuRgb8NfAUoNCud3Vef0Gnb93nXNIwPOo0cFxICHzY01OKT+DISZn18amn/QOgoBWtgehguVvrbBU9JrnD/AHYiimMtMzzQ9H3gCinLfJnYGcCAHANcYU59NKfsF5WtDoAHZing9UcTwetZ8sOSxwfed5fhwONzXGaeBnfYJgEOgC8BqdWp/9b1tL1dKDI1CrOT3eM4VhISPA3rHGvoGXz3PXx8dbJs1AuuoOR2NZSTy8bp15SCwybs7EFgzZWnHtpyoR3OAO90uxU7E3KRKfJUOGx3PAuKq5MwNQ4rO9BuK1odWNoEo6A4jV+7wL9ILvJp/z2s8xoRX0cB/z0OWQo6jK5f6KzfncxRKihuTMtuZ0BjA5ttSbGZCn2Hp2BIoZnRkn21p4Bd8uBSLAnP21vQiM6yeNCGHzyAowZTF/c7z11eCarAc+7cGufny1S4yT8jSgP7zdU3Zf5KQS5Z1y7AO2fA98GkUJywBHP8jdIQn9fPUGeZN3kJheVPNv4C3/zB36GycTWqvXZdm9j3uTENw5WT4G/vw2IdHjWg6Kx/79AO33SCz3gC2hNDGBn3UMOlBDqOlVpTSLg5LpoAcNiBHy3D3j5hPk0/efOeynuxP4HieT5Cnip3+QpgeZJfIs977K8vfjH5o5W3A4olqJRkHmPhwRYsrDE14KWfe0rZ16K7/ovzHr7e4U/5KvscsBXn+J37L6ASz0QPJk1jq5zDD6Fc6m5IBv5R3flMCxMRlPPiBWIrO3/JE3zKumhlNJUaW0GfLFT2akStJSTUI9n5tzZgeweUsc9eW+lMTG6FdeCv8/PM8WUq/CVyWJpoHmL5rd1/1fnl1/6AdpJCW8GDbThswVIN7m9CnPDxC0X7y/M57ws3m1wLLXf5NhsuotzUI3x+/oC5i9/tNFYrPlYr8mV4sCdJ2ciBX6qfOqYWxozUDfP6BHhOBELDBjo5GD2nVqeQCs5WXbK2W7sQt3l6SsWfeWoneFlZ/Uk+yDP8KhF3WOHfUQPexPCD1m/G/+2V96rDo0qAAtoNePMBPFwG60tgpSBRDTbNIRd1ng4rrLEJwCM8Pu59gLnJfPq796oqbfg++SKEOWhF4oqHDCw3ztqpxBcrNGwgzsFYdKI2KBpwXB6LYUlJYNQ7skkvVGFqEKoBxE0mB7T59++ZVJP5ieAqw/wcX8CiWOafsssi3wMOrUq/f3c62dgrhwQ5GDQwtUfxyqbNBfsxnbolbYFW/O7ylP9X32qo+7ZGxC6Ju1G24gJX7DB/vLeV3F8JfZQHeaf6pZzLCpVgunKqVqnAajGsax6sxLCqIOm+8/jaYO/uX6hKHc4YuLeMNgn/8B3D6dzQkf87LPI5foUicyzwi2zzPZaBHwIpVm/NL+dU9KTicJpgaJ2B+Vd5orrOjUbJPngw3Xz5/pWgcRSEDVLuHkzRSnYwgaUbsYf89kqFr+5v+nGKRvmSNSqGcHMCBl0gfWNQ/n501HWJRsGqw2ctbCi5J0wZ1x+w5MPGqdh+J5GIaiQU9JNVuDom4fCtRdjY40NXdPyLc3n9h3xHvZ8Pc4XPssGvsM43wSU/5oCGQkXlunryqa9zActk0CTnxRhQh+VGOP30bf+npjc6//vWjdbdynreXNtVkf8cHuo4h7B5MMpvvHGBoYH7VgMmq0veGBfw2dID1SXh4ZFs3Baw19PgZS2su1vFFPispfTNdGyn4sQvDMJURUpRyzuwuE6p2m5/+Ok37NdCW6gwzYf5DxzyezziP5PlW0eATx+fIIuf38dzrjF1wLaAl0AnQ/uFTz//ink19vhuoUWbq4A6bu8JUShtKeTqWhEqAg1PjMNg4WyaLiPBc51uDdtNSvS+t24h1TymCOdW6zm/2ejA7UcoouQvv/tO4o+s599kg6cpUufLLPAv6Tj4quePcfLa7srbcrnB2JH0UWAWuO1HOiq01DuBBf4vK/zwmICi30LnDlA5V+jTWqrJ/cJTizRiVZS02JxX97RAW+EzEsJefLZgORiIR3hQk/J2uw77R3bi+lprYmaluAXqQ0Cd/8Ntvk1CtyGr48LfpCcSVO65cldf7cjRwDMSuPI1JCG959Ip2XxeZQOe+W1szSjLmHihO1uSKi8FZ7VgeV/yFfkcVAb71wZHPJgx+MwlUhHa7CFhIJDyUZzKKh9uQ30Pr9joTDxxN9jQxpt3O7iPPSY5dtfUdZcCs1aRdsrYziBeEpI3imquyVBpm0tefHwkDHAJ+JvAK0iVzkgbAwA5L8KrLmOOxruJoVoTbm9I7SAjIQOflfASV/cMPNhOToKfNRAafPxUymL4sJlA1ZeGpEIsiJSCdgfi1A7eWE+GRhqlJnAH6XbLdilxt7XbTgMaQHJwGXvrs9jOALMlnyvhJZajDdqF2/zs7Lf4heEF5qgwzk12eMQOm/y0A5/07Nll4GmXAbIKSF0Xaa3dJaEQnAR/ujZoPdgxMKKPwffUBg1MpRCEMJxKN9bpIEBZbFQ0rVYxjpT18U1ijfJsrDxPdt80jB/7jXzgp0q3sdAqErJGWFjk7838jHm2ct2uJoN8ZXlWf+nVabX0rv/KPx7d4zrvYpB3U+K7LHOb1GlVRkDZeZRWSIqnFInVx8am1pK6xFjpZAW7dwQpXPEgDOFCdAyebpcY0FRQS8XVFVQ3FLZAIQ9RQ+0tTJZ+uDlslGcMgUlINER47jyr2Hie7XhKZfMriNQ2Win+zfo3lNFfIx9gB6rzSdye9L5Tm9ON0Xts8Ad8hk9yiY/hkeMRt4hcLjH7kwPINS1+JN1ex4ZFSzlsoOBqg+0+hk9BXUneo6SkY4xeAmqB1MyaCTS15Gsn4242TvswPg469qK9uoey0MEnTqUGb1xLVuD5VAtYz5OCJmD3m5ijNrtKKZSnaESs79/2vMpSAivxj6z2/5Pa8BSv87f5EJN8hDwDLPJ9DomONSEEPJ16vjIqNlZyFdqH+VGJTpWSoOj21qkCqZJa4KKBTiqXPjy5/wA+eyE8stIcrZBM75KkMCg6LSgGMnk1Lx0cyoprPGyL+jUTlzPsWUwWkjYjaX44cDtTDaB+SLq956cvzahgN9dJn7yrv1X6Qa7GnvoEz3Gd93KJLVq8hTteaOmOsTqHoWk9ScY4ebgApxTKjfX2pmuSAvY1bPc0ckfmBAkeP/9zL2aXke6xt2LGlQVbh6uuIUm5vrswkAREOQ+lvKTJrwxLDVGrkx1gOQ8GipJPGCrAOy/C5TEoFqDW0fFq3q9tTqZ+Lols9aH3urqrwecyZeo8pOlygWvAtjZmf22i066VAq5fFMJPj6yRqhFBtQDtsljk3tpgauFIgefh8ZmPvdg3WEitnOxLWooh542CL+dwvCxa0G+EviRdhopQcI1SI1WYGILUqHgr9teWx7yD5mBnYGg7XQ3v+Q9ZpUJK4LzKBrCuLHvLo+1GbTDH1YtCrD1PnieRYj13tkssI6Gj8ClqaJ3qu8/KR0PA0r4YxLHH1AYf7sFRR/KD3ikSlGtlub8ji7rhkirWQrUI770O44PYNx96C3cmCltbxdZzz77VKFysFVJK+iINii4mKANBPlVYAztHMDl4spEqk7fXhPvbYvWDUv/aYEnBjEVzjZNd2b21wUEr6eU7W66x6RT4rDYYpbB6AA96qkXH4FuuByiSf/em16yzJZfHYPIC+HlV36sU//g7z4QHt5/rfMp+0jSZ5S0XVwwDQeadVmqwsHeqDR7Ya8l6G5HYnxENlVP4ikr86qBBH7emZy/11gaz32rHcPcUCcs9tcEMTC8JSnXBZ4Azv31MgnINUDtwEEF1CIoV0nYYfOnVgfwXXlPx+6IPJ8/wAQ4JyQOeyq65RirXx4GPOgk+M8LlVMBmm+w+laEqvtrjn3/8RUILZSWNxJeR2plyh29rX4TFRjJChVBU7MFO//LYUadLwJ1zkqntRLrCyjlphFo7cM8UBDnwfOIoVrc22t739zvp84PT5tlCUS+xxpuLU7a2Wwnw8xLCH7rWOsXZtjnPg/FhqDh8iQ/TRsC7cao2iPQHn1cbTFJpVErO+VYHpwlGOkfPqR/KSIwcnVZvN7obuQJ4PrTq6vXVdvhLtZ3kI/PlVr3wznRtbViyH77flZc6WY8RR2DEQ3galPkz1gY9dwyslXa1uRG45GqDxoqBNKfO4IWq+Ofsunpns9t/lJ3BcuiSGUWJMd7alMtNprYWyOXgiUlII3bvLPlffq3hwWWwSuEXJWznlDylRAta0UlGIy1NUnsx1D2Y86GcuCPwTz7x4onaYGShoUVlvBh2G3L/zspjOD8/kJebSTsRVfM8GK/C1VEhyyLHpRC6Y6BdGisH18edC7OykwMFaCRyC/K1/P70sLTeDFdgfASKBUWuqPCKUK2KqxuvuExVj7xiCA13DMIAqiOSB9x3tqpjJdotyzcRij/9NXvmuzqLvDCDxAJbytUMem4oWam2pGDYyicrNSV59+xardz1TVtpuDLAtu02uvTOlUgfDOVUcpSx7crLAqvE+cIhCzUtNUytTs6TXUIuJRArWM0JuafxVTyY5TG1wbqBJU/KYruxfPTYb7Q8ybfvJJJ+Op6gdz4FfigE7Ef93wHJQ8Z52Iu6TQGnR1vL7u8m0Don8FIKinlJQ9WT/viOUrjvox/7Hd8g8t1gsaex+fSfioWBFKqeC4NPPQcpTQ0aGEohPGcuz5WVBxJxVefKUzAQy3z9nuMaEQYNDCiJQPsNT8EQ59QGez8tqyYn44TekTUeF1OYTmE8OPsN0XFcEcuHWTOuVndaXlaxeZy8LJNTMt0G79OqXVTi5wdTudFe0WdDdK3gstQGNeOJLDBblO75ji87p6X07KJOdV3jGZhOYEKatM79ji8rw52Q11OuOk9eTxpL5HGShF7w1czNWRhLuiT0yrso8sSZjiRSolr2xBD1fFd3PHmp5zu+0J4Enw0/hSlAeWJ1r5zz3eBo9t2g574bTM6Xt+BJMqAX/LEaOxJQcKhhzvaAz867lY+t8eW7wXF1Tm1wKIV2KGqq+wQV2aImfWEzl/YPPIJUOktCX743Om8MmR8vr5jCWE6Ah6a/PB/5GLKgoRKfEwxZSfVFgWjEmdogCrZ9WEtgTUNyjuE4UlJiWrFi/fuNSMsXqGsp7Pn930HBViZPne9hDnxYTWD1MfJiDasaVs2Pkaflu8g1l3V14/8Dn2F2t85muZkAAAAASUVORK5CYII="><h1>shuri-pad</h1></header>
+<div class="facts"><div class="fact"><span id="spin" class="spin">⠋</span><span class="fl">статус</span><span class="fv" id="stext">подключаюсь к плате…</span><span id="uspin" class="spin">⠋</span></div><div id="facts"></div></div>
 
 <form onsubmit="return save(event)">
 <div class="card">
@@ -112,20 +110,24 @@ button.primary:active{filter:brightness(.85);transform:scale(.985)}
   <input id="pass" type="password" placeholder="пароль" autocomplete="new-password" style="margin-top:8px">
   <p class="m" style="margin:8px 0 0">Пустой SSID — настройки WiFi не менять.</p>
 </div>
-<button class="primary" type="submit">Сохранить и перезагрузить</button>
+<button class="primary" type="submit"><span id="bspin"></span>Сохранить и перезагрузить</button>
 </form>
 <div class="acts">
   <button class="ghost" type="button" onclick="return reboot(event)">⟳ перезагрузить без сохранения</button>
 </div>
 
-<div id="overlay"><div class="card"><div id="ovicon"></div><div id="ovtext"></div><button class="ghost" type="button" style="flex:none" onclick="document.getElementById('overlay').style.display='none'">понятно</button></div></div>
+<div id="overlay"><div class="card"><div id="ovicon"></div><div id="ovtext"></div><button class="ghost" type="button" style="flex:none" onclick="hideOverlay()">понятно</button></div></div>
 
 <script>
 let CATALOG=[],NAMEBY={},ORIG=[0,0,0,0,0,0,0,0],IDX=[0,0,0,0,0,0,0,0],NUMS=[];
-let DEMO=false,busy=false,spinT=null,readyStatus='',holdUntil=0,minHeap=0,RAMV=null;
+let DEMO=false,busy=false,spinT=null,readyStatus='',holdUntil=0,minHeap=0,RAMV=null,uspinT=null,bspinT=null,ovT=null;
 const FRAMES='⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏',DEFAULTS=['LMB','RMB','F5','Q','Space','LShift','LCtrl','F1'];
 const $=id=>document.getElementById(id);
 const el=(t,c,txt)=>{const d=document.createElement(t);if(c)d.className=c;if(txt!==undefined)d.textContent=txt;return d};
+
+/* запустить брайль-анимацию в любом элементе, вернуть id интервала */
+const spinIn=(elm,suffix)=>{let i=Math.max(0,FRAMES.indexOf(elm.textContent));
+  return setInterval(()=>{elm.textContent=FRAMES[i=(i+1)%FRAMES.length]+(suffix||'')},80)};
 
 /* строка статуса: брайлевский спиннер при работе, зелёная галочка в покое */
 function setBusy(b,text){
@@ -140,7 +142,7 @@ function setBusy(b,text){
 }
 const fmtUp=s=>{s=+s||0;const m=Math.floor(s/60),h=Math.floor(m/60);
   return h?h+'ч '+(m%60)+'м':(m?m+'м '+(s%60)+'с':s+'с')};
-const fmtRam=h=>{const c=Math.round((h||0)/1024);return minHeap&&minHeap<c?c+' КБ (мин '+minHeap+')':c+' КБ'};
+const fmtRam=(h,total)=>{const c=Math.round((h||0)/1024);const base=total?c+' из '+Math.round(total/1024)+' КБ':c+' КБ';return minHeap&&minHeap<c?base+' (мин '+minHeap+')':base};
 function notice(text){holdUntil=Date.now()+3500;setBusy(false,text);}
 
 function demoState(){
@@ -151,7 +153,7 @@ function demoState(){
   ['Space','Enter','Esc','Tab','BackSp','LShift','LCtrl','LAlt','Up','Down','Left','Right'].forEach(n=>c.push({n,m:0}));
   const names=['LMB','RMB','W','S','A','D','Space','I'];
   return {sta:true,apip:'192.168.4.1',ip:'192.168.31.151',ssid:'Strela-31',
-    catalog:c,b:names.map(n=>c.findIndex(x=>x.n===n)),names,heap:190*1024,up:372};
+    catalog:c,b:names.map(n=>c.findIndex(x=>x.n===n)),names,heap:190*1024,heapSize:327680,up:372};
 }
 
 async function init(){
@@ -168,7 +170,7 @@ async function init(){
   for(let i=0;i<8;i++)g.appendChild(el('div','cell',String(i+1)));
   if(DEMO){
     setBusy(false,'демо-просмотр · плата не отвечает');
-    $('livetext').textContent='демо';
+    $('livetext').textContent='демо';$('uspin').style.display='none';
     // плата могла ещё подниматься (или глюкнуть): сами ждём её и переходим в живой режим
     const t=setInterval(async()=>{
       try{const S2=await(await fetch('/api/state',{cache:'no-store'})).json();
@@ -187,7 +189,7 @@ const statusText=S=>'готово · '+CATALOG.length+' '+plural(CATALOG.length,
 // inline SVG в стиле Material Symbols: внешний шрифт иконок в AP-режиме недоступен (нет интернета)
 const ICONS={
   wifi:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>',
-  ap:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 11c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 2c0-3.31-2.69-6-6-6s-6 2.69-6 6c0 2.22 1.2 4.15 3 5.19l1-1.74c-1.19-.7-2-1.97-2-3.45 0-2.21 1.79-4 4-4s4 1.79 4 4c0 1.48-.81 2.75-2 3.45l1 1.74c1.8-1.04 3-2.97 3-5.19zM12 3C6.48 3 2 7.48 2 13c0 3.7 2.01 6.92 4.99 8.65l1-1.73C5.61 18.53 4 15.96 4 13c0-4.42 3.58-8 8-8s8 3.58 8 8c0 2.96-1.61 5.53-4 7.92l1 1.73c2.99-1.73 5-4.95 5-8.65 0-5.52-4.48-10-10-10z"/></svg>',
+  ap:'<svg viewBox="0 -960 960 960" fill="currentColor"><path d="M204-150q-57-55-90.5-129.5T80-440q0-83 31.5-156T197-723q54-54 127-85.5T480-840q83 0 156 31.5T763-723q54 54 85.5 127T880-440q0 86-33.5 161T756-150l-56-56q46-44 73-104.5T800-440q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 69 27 129t74 104l-57 57Zm113-113q-35-33-56-78.5T240-440q0-100 70-170t170-70q100 0 170 70t70 170q0 53-21 99t-56 78l-57-57q25-23 39.5-54t14.5-66q0-66-47-113t-113-47q-66 0-113 47t-47 113q0 36 14.5 66.5T374-320l-57 57Zm106.5-120.5Q400-407 400-440t23.5-56.5Q447-520 480-520t56.5 23.5Q560-473 560-440t-23.5 56.5Q513-360 480-360t-56.5-23.5Z"/></svg>',
   link:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>',
   ram:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M15 9H9v6h6V9zm-2 4h-2v-2h2v2zm8-2V9h-2V7c0-1.1-.9-2-2-2h-2V3h-2v2h-2V3H9v2H7c-1.1 0-2 .9-2 2v2H3v2h2v2H3v2h2v2c0 1.1.9 2 2 2h2v2h2v-2h2v2h2v-2h2c1.1 0 2-.9 2-2v-2h2v-2h-2v-2h2zm-4 6H7V7h10v10z"/></svg>'
 };
@@ -207,7 +209,7 @@ function facts(S){
   row('wifi',S.sta?'ok':'','WiFi',S.sta?((S.ssid||'?')+' · '+S.ip):'не подключено');
   row('ap','bl','точка доступа','shuripad · '+S.apip);
   if(S.sta)row('link','','страница','shuripad.local');
-  RAMV=row('ram','','RAM',fmtRam(S.heap)).querySelector('.fv');
+  RAMV=row('ram','','RAM',fmtRam(S.heap,S.heapSize)).querySelector('.fv');
 }
 
 function paintNums(){
@@ -270,6 +272,7 @@ function resetDefaults(){
 /* живой опрос состояния кнопок (3 раза в секунду) */
 function startPoll(){
   let fails=0;
+  uspinT=spinIn($('uspin'));
   const t=setInterval(async()=>{
     try{
       const r=await fetch('/api/state',{cache:'no-store'});
@@ -279,13 +282,15 @@ function startPoll(){
       if(s.heap&&s.up!==undefined){
         const kb=Math.round(s.heap/1024);
         if(!minHeap||kb<minHeap)minHeap=kb;
-        if(RAMV)RAMV.textContent=fmtRam(s.heap);
+        if(RAMV)RAMV.textContent=fmtRam(s.heap,s.heapSize);
         readyStatus=statusText(s);if(!busy&&Date.now()>holdUntil)setBusy(false,readyStatus);
       }
+      if(!uspinT){$('uspin').style.display='';uspinT=spinIn($('uspin'));}
       fails=0;$('livedot').className='dot g';$('livetext').textContent='живой опрос';
     }catch(e){
       document.querySelectorAll('#padgrid .cell').forEach(c=>c.classList.remove('on'));
-      if(++fails>=4){$('livedot').className='dot';$('livetext').textContent='нет связи';}
+      if(++fails>=4){$('livedot').className='dot';$('livetext').textContent='нет связи';
+        clearInterval(uspinT);uspinT=null;$('uspin').style.display='none';}
     }
   },330);
 }
@@ -293,6 +298,7 @@ function startPoll(){
 async function save(e){
   e.preventDefault();
   if(DEMO)return overlay('ⓘ','Это демо-просмотр страницы без платы.');
+  if(busy)return false;
   const fd=new URLSearchParams();
   for(let i=0;i<8;i++){
     const inp=$('bi'+i);
@@ -309,10 +315,11 @@ async function save(e){
     fd.append('ssid',ssid);
     fd.append('pass',$('pass').value);
   }
-  setBusy(true,'сохраняю настройки…');
+  setBusy(true,'сохраняю настройки…');bspinT=spinIn($('bspin'),' ');
   try{
     const r=await fetch('/save',{method:'POST',body:fd});
     if(!r.ok){
+      clearInterval(bspinT);$('bspin').textContent='';
       setBusy(false,readyStatus);
       overlay('⚠','Плата отказала: HTTP '+r.status+'. '+(await r.text()).replace(/<[^>]*>/g,' ').trim());
       return false;
@@ -328,17 +335,21 @@ async function save(e){
 async function reboot(e){
   e.preventDefault();
   if(DEMO)return overlay('ⓘ','Это демо-просмотр страницы без платы.');
-  overlay('⠋','Перезагрузка…');
+  if(busy)return false;
+  overlay('⠋','Перезагрузка…',true);
   try{ await fetch('/reboot'); }catch(err){}
   return false;
 }
 
-function overlay(icon,text){
-  $('ovicon').textContent=icon;
-  $('ovicon').style.color=icon==='✓'?'var(--green)':icon==='⚠'?'var(--red)':'var(--blue)';
+function overlay(icon,text,spin){
+  clearInterval(ovT);ovT=null;
+  $('ovicon').textContent=spin?FRAMES[0]:icon;
+  $('ovicon').style.color=spin?'var(--blue)':icon==='✓'?'var(--green)':icon==='⚠'?'var(--red)':'var(--blue)';
   $('ovtext').textContent=text;
   $('overlay').style.display='flex';
+  if(spin)ovT=spinIn($('ovicon'));
 }
+function hideOverlay(){clearInterval(ovT);ovT=null;$('overlay').style.display='none'}
 
 /* сетка под страницей ярчеет, когда печатаешь */
 document.addEventListener('focusin',e=>{if(e.target.tagName==='INPUT')document.body.classList.add('typing')});
