@@ -3,83 +3,193 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="shuripad-ui" content="v1">
+<meta name="shuripad-ui" content="v2">
 <title>shuri-pad</title>
 <style>
-:root{color-scheme:dark}
+:root{
+  color-scheme:dark;
+  --bg:#0b0d11;--panel:#12151c;--panel2:#181c25;--border:#242b39;--border2:#313b4f;
+  --text:#dce1ea;--dim:#8b93a3;--dimmer:#5b6373;
+  --blue:#4d8dff;--blue-soft:rgba(77,141,255,.13);--green:#41c463;--red:#e0645c;
+  --mono:ui-monospace,'Cascadia Code','JetBrains Mono',Menlo,Consolas,monospace;
+}
 *{box-sizing:border-box}
-body{font-family:system-ui,sans-serif;background:#0e1014;color:#e7eaf0;max-width:520px;margin:0 auto;padding:16px 14px 40px}
-h1{font-size:1.45rem;margin:2px 0 4px}
-h2{font-size:1rem;margin:0 0 6px}
-.m{color:#8d95a8;font-size:.85rem}
-.pill{display:inline-block;background:#1a2130;border:1px solid #26304a;border-radius:99px;padding:3px 10px;margin:3px 6px 0 0;font-size:.8rem}
-.card{background:#151922;border:1px solid #232b3d;border-radius:14px;padding:14px;margin:14px 0}
-.row{display:grid;grid-template-columns:72px 1fr;gap:8px 10px;align-items:center;margin:7px 0}
-input{width:100%;padding:10px 12px;border-radius:9px;border:1px solid #2a3145;background:#0e1014;color:#e7eaf0;font:inherit}
-input:focus{outline:none;border-color:#3b82f6}
-input.err{border-color:#ef4444}
-button{width:100%;padding:13px;border:0;border-radius:11px;background:#3b82f6;color:#fff;font-size:1rem;font-weight:600;margin-top:10px}
-button:active{filter:brightness(.85)}
-a{color:#7aa2ff}
+html,body{margin:0}
+body{font-family:system-ui,sans-serif;background:var(--bg);color:var(--text);max-width:560px;margin:0 auto;padding:20px 16px 48px}
+/* едва заметная синяя сетка как в Qwen Code; при фокусе в поле — ярче */
+body::before{content:"";position:fixed;inset:0;z-index:-1;opacity:.55;transition:opacity .3s;
+  background-image:linear-gradient(rgba(77,141,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(77,141,255,.05) 1px,transparent 1px);
+  background-size:27px 27px;
+  -webkit-mask-image:radial-gradient(ellipse 100% 65% at 50% 0%,#000 25%,transparent 95%);
+  mask-image:radial-gradient(ellipse 100% 65% at 50% 0%,#000 25%,transparent 95%)}
+body.typing::before{opacity:1}
+
+header{display:flex;align-items:center;gap:12px}
+.logo{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;
+  background:linear-gradient(135deg,#2f6fe0,#4d8dff);box-shadow:0 4px 18px rgba(77,141,255,.35);
+  font:700 1.15rem var(--mono);color:#fff}
+h1{font-size:1.35rem;margin:0;letter-spacing:.2px}
+h2{font-size:.95rem;margin:0}
+
+#statusline{font:.8rem var(--mono);color:var(--dim);margin:12px 2px 0;min-height:1.2em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.spin{display:inline-block;width:1.25em;color:var(--blue)}
+.spin.ok{color:var(--green)}
+
+.pills{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 2px}
+.pill{display:inline-flex;align-items:center;gap:7px;background:var(--panel2);border:1px solid var(--border);border-radius:99px;padding:4px 11px;font-size:.76rem;color:var(--dim)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--dimmer);flex:none}
+.dot.g{background:var(--green);box-shadow:0 0 8px rgba(65,196,99,.7)}
+.dot.b{background:var(--blue);box-shadow:0 0 8px rgba(77,141,255,.7)}
+.mono{font-family:var(--mono)}
+
+.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:15px 15px 13px;margin:14px 0}
+.cardhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.link{background:none;border:0;padding:0;color:var(--dimmer);font:.78rem var(--mono);cursor:pointer}
+.link:hover{color:var(--blue)}
+
+.row{display:grid;grid-template-columns:40px 1fr;gap:10px;align-items:center;margin:7px 0}
+.num{height:38px;border-radius:9px;display:grid;place-items:center;font:.85rem var(--mono);color:var(--dimmer);background:var(--panel2);border:1px solid var(--border);transition:all .2s}
+.num.chg{color:var(--blue);border-color:var(--blue);background:var(--blue-soft);box-shadow:0 0 10px rgba(77,141,255,.25)}
+
+input{width:100%;padding:10px 12px;border-radius:9px;border:1px solid var(--border);background:var(--panel2);color:var(--text);font:inherit;transition:border-color .15s,box-shadow .15s}
+input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-soft)}
+input.err{border-color:var(--red);box-shadow:0 0 0 3px rgba(224,100,92,.15)}
+input::placeholder{color:var(--dimmer)}
+
 .combo{position:relative}
-.drop{position:absolute;left:0;right:0;top:calc(100% + 4px);background:#181d28;border:1px solid #2a3145;border-radius:10px;max-height:236px;overflow-y:auto;z-index:20;display:none;box-shadow:0 10px 30px rgba(0,0,0,.55)}
-.drop div{padding:9px 12px;cursor:pointer}
-.drop div:hover{background:#222b40}
-.tag{font-size:.72rem;color:#8d95a8;text-transform:uppercase;letter-spacing:.4px;margin-right:8px}
-#overlay{position:fixed;inset:0;background:rgba(5,7,10,.78);display:none;align-items:center;justify-content:center;padding:24px;text-align:center;z-index:50}
-#overlay .card{max-width:340px;margin:0}
+.drop{position:absolute;left:0;right:0;top:calc(100% + 5px);background:#161a23;border:1px solid var(--border2);border-radius:11px;max-height:238px;overflow-y:auto;z-index:20;display:none;box-shadow:0 14px 38px rgba(0,0,0,.6)}
+.drop div{padding:9px 12px;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:.9rem}
+.drop div:hover{background:var(--blue-soft)}
+.tag{font:600 .62rem var(--mono);color:var(--dimmer);border:1px solid var(--border);border-radius:5px;padding:2px 5px;text-transform:uppercase;letter-spacing:.5px;flex:none}
+.tag.mouse{color:var(--blue);border-color:rgba(77,141,255,.4)}
+
+#padgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.cell{aspect-ratio:1.7;border-radius:10px;display:grid;place-items:center;font:1.15rem var(--mono);color:var(--dim);
+  background:var(--panel2);border:1px solid var(--border);transition:all .08s;user-select:none}
+.cell.on{color:#fff;background:var(--blue-soft);border-color:var(--blue);box-shadow:0 0 16px rgba(77,141,255,.45);transform:scale(.95)}
+.live{display:inline-flex;align-items:center;gap:6px;font:.72rem var(--mono);color:var(--dimmer)}
+
+button.primary{width:100%;padding:14px;border:0;border-radius:11px;background:linear-gradient(135deg,#2f6fe0,#4d8dff);color:#fff;font-size:.98rem;font-weight:600;cursor:pointer;margin-top:14px;box-shadow:0 4px 18px rgba(47,111,224,.3);transition:filter .15s,transform .08s}
+button.primary:active{filter:brightness(.85);transform:scale(.985)}
+.acts{display:flex;gap:10px;margin-top:10px}
+.ghost{flex:1;padding:10px;border-radius:10px;background:transparent;border:1px solid var(--border);color:var(--dim);font:.84rem var(--mono);cursor:pointer;transition:all .15s}
+.ghost:hover{border-color:var(--border2);color:var(--text)}
+
+#overlay{position:fixed;inset:0;background:rgba(7,9,13,.74);backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;padding:24px;text-align:center;z-index:50}
+#overlay .card{max-width:330px;margin:0;padding:22px 20px}
+#ovicon{font:1.6rem var(--mono);margin-bottom:8px}
+#ovtext{line-height:1.45;margin-bottom:14px}
+
+.m{color:var(--dimmer);font-size:.79rem;line-height:1.45}
+::selection{background:rgba(77,141,255,.35)}
 </style>
 </head>
 <body>
-<h1>shuri-pad</h1>
-<div id="status" class="m">Загрузка состояния платы…</div>
+<header><div class="logo">⌗</div><h1>shuri-pad</h1></header>
+<div id="statusline"><span id="spin" class="spin">⠋</span><span id="stext">подключаюсь к плате…</span></div>
+<div id="pills" class="pills"></div>
 
 <form onsubmit="return save(event)">
 <div class="card">
-  <h2>Кнопки</h2>
+  <div class="cardhead"><h2>Кнопки</h2><button type="button" class="link" onclick="resetDefaults()">сбросить к дефолтам</button></div>
   <div id="rows"></div>
   <p class="m">Начни печатать — список отфильтруется. Мышь: LMB / RMB / MMB.</p>
 </div>
 <div class="card">
-  <h2>WiFi (домашняя сеть)</h2>
+  <div class="cardhead"><h2>Тест кнопок</h2><span class="live"><span class="dot" id="livedot"></span><span id="livetext">опрос…</span></span></div>
+  <div id="padgrid"></div>
+  <p class="m">Зажми кнопку на паде — ячейка загорится.</p>
+</div>
+<div class="card">
+  <h2 style="margin-bottom:10px">WiFi (домашняя сеть)</h2>
   <input id="ssid" placeholder="SSID сети" autocomplete="off">
   <input id="pass" type="password" placeholder="пароль" autocomplete="new-password" style="margin-top:8px">
-  <p class="m">Пустой SSID — настройки WiFi не менять.</p>
+  <p class="m" style="margin:8px 0 0">Пустой SSID — настройки WiFi не менять.</p>
 </div>
-<button type="submit">Сохранить и перезагрузить</button>
+<button class="primary" type="submit">Сохранить и перезагрузить</button>
 </form>
-<p class="m"><a href="#" onclick="return reboot(event)">Перезагрузить без сохранения</a></p>
+<div class="acts">
+  <button class="ghost" type="button" onclick="return reboot(event)">⟳ перезагрузить без сохранения</button>
+</div>
 
-<div id="overlay"><div class="card"><div id="ovtext"></div><button onclick="document.getElementById('overlay').style.display='none'">Понятно</button></div></div>
+<div id="overlay"><div class="card"><div id="ovicon"></div><div id="ovtext"></div><button class="ghost" type="button" style="flex:none" onclick="document.getElementById('overlay').style.display='none'">понятно</button></div></div>
 
 <script>
-let CATALOG=[], NAMEBY={};
-const IDX=[0,0,0,0,0,0,0,0];
+let CATALOG=[],NAMEBY={},ORIG=[0,0,0,0,0,0,0,0],IDX=[0,0,0,0,0,0,0,0],NUMS=[];
+let DEMO=false,busy=false,spinT=null,readyStatus='';
+const FRAMES='⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏',DEFAULTS=['LMB','RMB','F5','Q','Space','LShift','LCtrl','F1'];
 const $=id=>document.getElementById(id);
 const el=(t,c,txt)=>{const d=document.createElement(t);if(c)d.className=c;if(txt!==undefined)d.textContent=txt;return d};
 
+/* строка статуса: брайлевский спиннер при работе, зелёная галочка в покое */
+function setBusy(b,text){
+  busy=b;clearInterval(spinT);
+  const s=$('spin');
+  if(b){
+    s.textContent=FRAMES[0];s.classList.remove('ok');$('stext').textContent=text;
+    spinT=setInterval(()=>{s.textContent=FRAMES[(FRAMES.indexOf(s.textContent)+1)%FRAMES.length]},80);
+  }else{
+    s.textContent='✓';s.classList.add('ok');$('stext').textContent=text;
+  }
+}
+const fmtUp=s=>{s=+s||0;const m=Math.floor(s/60),h=Math.floor(m/60);
+  return h?h+'ч '+(m%60)+'м':(m?m+'м '+(s%60)+'с':s+'с')};
+
+function demoState(){
+  const c=[['LMB',1],['RMB',1],['MMB',1]].map(x=>({n:x[0],m:x[1]}));
+  for(let i=65;i<=90;i++)c.push({n:String.fromCharCode(i),m:0});
+  for(let i=48;i<=57;i++)c.push({n:String.fromCharCode(i),m:0});
+  for(let i=1;i<=12;i++)c.push({n:'F'+i,m:0});
+  ['Space','Enter','Esc','Tab','BackSp','LShift','LCtrl','LAlt','Up','Down','Left','Right'].forEach(n=>c.push({n,m:0}));
+  const names=['LMB','RMB','W','S','A','D','Space','I'];
+  return {sta:true,apip:'192.168.4.1',ip:'192.168.31.151',ssid:'Strela-31',
+    catalog:c,b:names.map(n=>c.findIndex(x=>x.n===n)),names,heap:190*1024,up:372};
+}
+
 async function init(){
   let S;
-  try{ S=await (await fetch('/api/state')).json(); }
-  catch(e){ $('status').textContent='Плата не отвечает (/api/state)'; return; }
+  try{S=await(await fetch('/api/state')).json();}
+  catch(e){DEMO=true;S=demoState();}
   CATALOG=S.catalog;
   CATALOG.forEach((c,i)=>NAMEBY[c.n]=i);
-  for(let i=0;i<8;i++) IDX[i]=S.b[i];
-  const pills=[S.sta?'домашняя сеть + точка доступа':'точка доступа','AP '+S.apip];
-  if(S.ip) pills.push('WiFi '+S.ip);
-  pills.push(S.ssid?('SSID: '+S.ssid):'WiFi не настроен');
-  $('status').textContent='';
-  pills.forEach(t=>$('status').appendChild(el('span','pill',t)));
+  for(let i=0;i<8;i++){IDX[i]=S.b[i];ORIG[i]=S.b[i];}
+  pills(S);
   const rows=$('rows');
-  for(let i=0;i<8;i++) rows.appendChild(makeRow(i,S.names[i]));
+  for(let i=0;i<8;i++)rows.appendChild(makeRow(i,S.names[i]));
+  const g=$('padgrid');
+  for(let i=0;i<8;i++)g.appendChild(el('div','cell',String(i+1)));
+  if(DEMO){
+    setBusy(false,'демо-просмотр · плата не отвечает');
+    $('livetext').textContent='демо';
+  }else{
+    readyStatus='готово · '+CATALOG.length+' действий · RAM '+Math.round(S.heap/1024)+' КБ · '+fmtUp(S.up);
+    setBusy(false,readyStatus);
+    startPoll();
+  }
+}
+
+function pills(S){
+  const P=$('pills');
+  const add=(cls,txt,mono)=>{const p=el('span','pill');
+    if(cls)p.appendChild(el('span','dot '+cls));
+    p.appendChild(el('span',mono?'mono':null,txt));P.appendChild(p);};
+  add(S.sta?'g':null,S.sta?'домашняя сеть':'только точка доступа');
+  add('b','AP '+S.apip,true);
+  if(S.ip)add(null,'WiFi '+S.ip,true);
+  add(null,S.ssid?'SSID: '+S.ssid:'WiFi не настроен');
+}
+
+function paintNums(){
+  for(let i=0;i<8;i++)NUMS[i].classList.toggle('chg',IDX[i]!==ORIG[i]);
 }
 
 function makeRow(i,name){
   const row=el('div','row');
-  row.appendChild(el('div',null,'Кнопка '+(i+1)));
+  const num=el('div','num',String(i+1));
+  NUMS.push(num);row.appendChild(num);
   const combo=el('div','combo');
   const inp=document.createElement('input');
-  inp.value=name; inp.autocomplete='off'; inp.id='bi'+i;
+  inp.value=name;inp.autocomplete='off';inp.id='bi'+i;
   const drop=el('div','drop');
   combo.append(inp,drop);
   row.appendChild(combo);
@@ -89,24 +199,22 @@ function makeRow(i,name){
     const ql=q.trim().toLowerCase();
     CATALOG.forEach((c,j)=>{
       if(ql && !c.n.toLowerCase().includes(ql)) return;
-      const d=document.createElement('div');
-      d.appendChild(el('span','tag',c.m?'мышь':'клавиша'));
+      const d=el('div');
+      d.appendChild(el('span','tag'+(c.m?' mouse':''),c.m?'мышь':'клавиша'));
       d.appendChild(document.createTextNode(c.n));
       d.addEventListener('pointerdown',e=>{e.preventDefault();pick(j);});
       drop.appendChild(d);
     });
   };
-  const show=()=>drop.style.display='block';
-  const hide=()=>drop.style.display='none';
   const pick=j=>{
     inp.value=CATALOG[j].n;
-    IDX[i]=j;
+    IDX[i]=j;paintNums();
     inp.classList.remove('err');
-    hide();
+    drop.style.display='none';
   };
-  inp.addEventListener('focus',()=>{paint(inp.value);show();});
-  inp.addEventListener('input',()=>{paint(inp.value);show();});
-  inp.addEventListener('blur',()=>setTimeout(hide,180));
+  inp.addEventListener('focus',()=>{paint(inp.value);drop.style.display='block';});
+  inp.addEventListener('input',()=>{paint(inp.value);drop.style.display='block';});
+  inp.addEventListener('blur',()=>setTimeout(()=>drop.style.display='none',180));
   inp.addEventListener('keydown',e=>{
     if(e.key==='Enter'){
       e.preventDefault();
@@ -118,15 +226,44 @@ function makeRow(i,name){
   return row;
 }
 
+function resetDefaults(){
+  if(DEMO)return overlay('ⓘ','Это демо-просмотр страницы без платы.');
+  DEFAULTS.forEach((n,i)=>{
+    const inp=$('bi'+i),j=NAMEBY[n];
+    if(j!==undefined){inp.value=n;inp.classList.remove('err');IDX[i]=j;}
+  });
+  paintNums();
+  setBusy(false,'биндинги сброшены к дефолтам — не забудь «Сохранить»');
+  setTimeout(()=>{if(!busy)setBusy(false,readyStatus);},3500);
+}
+
+/* живой опрос состояния кнопок (3 раза в секунду) */
+function startPoll(){
+  let fails=0;
+  const t=setInterval(async()=>{
+    try{
+      const r=await fetch('/api/state');
+      if(!r.ok)throw 0;
+      const s=await r.json();
+      document.querySelectorAll('#padgrid .cell').forEach((c,i)=>c.classList.toggle('on',!!s.keys[i]));
+      fails=0;$('livedot').className='dot g';$('livetext').textContent='живой опрос';
+    }catch(e){
+      document.querySelectorAll('#padgrid .cell').forEach(c=>c.classList.remove('on'));
+      if(++fails>=4){clearInterval(t);$('livedot').className='dot';$('livetext').textContent='нет связи';}
+    }
+  },330);
+}
+
 async function save(e){
   e.preventDefault();
+  if(DEMO)return overlay('ⓘ','Это демо-просмотр страницы без платы.');
   const fd=new URLSearchParams();
   for(let i=0;i<8;i++){
     const inp=$('bi'+i);
     const j=NAMEBY[inp.value.trim()];
     if(j===undefined){
       inp.classList.add('err');
-      overlay('Неизвестное действие «'+inp.value+'» в кнопке '+(i+1));
+      overlay('⚠','Неизвестное действие «'+inp.value+'» в кнопке '+(i+1));
       return false;
     }
     fd.append('b'+(i+1),j);
@@ -136,27 +273,40 @@ async function save(e){
     fd.append('ssid',ssid);
     fd.append('pass',$('pass').value);
   }
+  setBusy(true,'сохраняю настройки…');
   try{
     const r=await fetch('/save',{method:'POST',body:fd});
-    if(!r.ok){ overlay('Плата отказала: HTTP '+r.status+'. '+(await r.text()).replace(/<[^>]*>/g,' ').trim()); return false; }
+    if(!r.ok){
+      setBusy(false,readyStatus);
+      overlay('⚠','Плата отказала: HTTP '+r.status+'. '+(await r.text()).replace(/<[^>]*>/g,' ').trim());
+      return false;
+    }
   }catch(err){
     // плата ушла в перезагрузку, не успев дочитать ответ, — сохранение прошло
   }
-  overlay('Сохранено. Плата перезагружается в рабочий режим, портал сейчас закроется.');
+  setBusy(true,'сохранено, плата перезагружается…');
+  overlay('✓','Сохранено. Плата перезагружается в рабочий режим, портал сейчас закроется.');
   return false;
 }
 
 async function reboot(e){
   e.preventDefault();
-  overlay('Перезагрузка…');
+  if(DEMO)return overlay('ⓘ','Это демо-просмотр страницы без платы.');
+  overlay('⠋','Перезагрузка…');
   try{ await fetch('/reboot'); }catch(err){}
   return false;
 }
 
-function overlay(t){
-  $('ovtext').textContent=t;
+function overlay(icon,text){
+  $('ovicon').textContent=icon;
+  $('ovicon').style.color=icon==='✓'?'var(--green)':icon==='⚠'?'var(--red)':'var(--blue)';
+  $('ovtext').textContent=text;
   $('overlay').style.display='flex';
 }
+
+/* сетка под страницей ярчеет, когда печатаешь */
+document.addEventListener('focusin',e=>{if(e.target.tagName==='INPUT')document.body.classList.add('typing')});
+document.addEventListener('focusout',()=>document.body.classList.remove('typing'));
 
 init();
 </script>
