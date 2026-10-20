@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="shuripad-ui" content="v1">
+<title>shuri-pad</title>
+<style>
+:root{color-scheme:dark}
+*{box-sizing:border-box}
+body{font-family:system-ui,sans-serif;background:#0e1014;color:#e7eaf0;max-width:520px;margin:0 auto;padding:16px 14px 40px}
+h1{font-size:1.45rem;margin:2px 0 4px}
+h2{font-size:1rem;margin:0 0 6px}
+.m{color:#8d95a8;font-size:.85rem}
+.pill{display:inline-block;background:#1a2130;border:1px solid #26304a;border-radius:99px;padding:3px 10px;margin:3px 6px 0 0;font-size:.8rem}
+.card{background:#151922;border:1px solid #232b3d;border-radius:14px;padding:14px;margin:14px 0}
+.row{display:grid;grid-template-columns:72px 1fr;gap:8px 10px;align-items:center;margin:7px 0}
+input{width:100%;padding:10px 12px;border-radius:9px;border:1px solid #2a3145;background:#0e1014;color:#e7eaf0;font:inherit}
+input:focus{outline:none;border-color:#3b82f6}
+input.err{border-color:#ef4444}
+button{width:100%;padding:13px;border:0;border-radius:11px;background:#3b82f6;color:#fff;font-size:1rem;font-weight:600;margin-top:10px}
+button:active{filter:brightness(.85)}
+a{color:#7aa2ff}
+.combo{position:relative}
+.drop{position:absolute;left:0;right:0;top:calc(100% + 4px);background:#181d28;border:1px solid #2a3145;border-radius:10px;max-height:236px;overflow-y:auto;z-index:20;display:none;box-shadow:0 10px 30px rgba(0,0,0,.55)}
+.drop div{padding:9px 12px;cursor:pointer}
+.drop div:hover{background:#222b40}
+.tag{font-size:.72rem;color:#8d95a8;text-transform:uppercase;letter-spacing:.4px;margin-right:8px}
+#overlay{position:fixed;inset:0;background:rgba(5,7,10,.78);display:none;align-items:center;justify-content:center;padding:24px;text-align:center;z-index:50}
+#overlay .card{max-width:340px;margin:0}
+</style>
+</head>
+<body>
+<h1>shuri-pad</h1>
+<div id="status" class="m">Загрузка состояния платы…</div>
+
+<form onsubmit="return save(event)">
+<div class="card">
+  <h2>Кнопки</h2>
+  <div id="rows"></div>
+  <p class="m">Начни печатать — список отфильтруется. Мышь: LMB / RMB / MMB.</p>
+</div>
+<div class="card">
+  <h2>WiFi (домашняя сеть)</h2>
+  <input id="ssid" placeholder="SSID сети" autocomplete="off">
+  <input id="pass" type="password" placeholder="пароль" autocomplete="new-password" style="margin-top:8px">
+  <p class="m">Пустой SSID — настройки WiFi не менять.</p>
+</div>
+<button type="submit">Сохранить и перезагрузить</button>
+</form>
+<p class="m"><a href="#" onclick="return reboot(event)">Перезагрузить без сохранения</a></p>
+
+<div id="overlay"><div class="card"><div id="ovtext"></div><button onclick="document.getElementById('overlay').style.display='none'">Понятно</button></div></div>
+
+<script>
+let CATALOG=[], NAMEBY={};
+const IDX=[0,0,0,0,0,0,0,0];
+const $=id=>document.getElementById(id);
+const el=(t,c,txt)=>{const d=document.createElement(t);if(c)d.className=c;if(txt!==undefined)d.textContent=txt;return d};
+
+async function init(){
+  let S;
+  try{ S=await (await fetch('/api/state')).json(); }
+  catch(e){ $('status').textContent='Плата не отвечает (/api/state)'; return; }
+  CATALOG=S.catalog;
+  CATALOG.forEach((c,i)=>NAMEBY[c.n]=i);
+  for(let i=0;i<8;i++) IDX[i]=S.b[i];
+  const pills=[S.sta?'домашняя сеть + точка доступа':'точка доступа','AP '+S.apip];
+  if(S.ip) pills.push('WiFi '+S.ip);
+  pills.push(S.ssid?('SSID: '+S.ssid):'WiFi не настроен');
+  $('status').textContent='';
+  pills.forEach(t=>$('status').appendChild(el('span','pill',t)));
+  const rows=$('rows');
+  for(let i=0;i<8;i++) rows.appendChild(makeRow(i,S.names[i]));
+}
+
+function makeRow(i,name){
+  const row=el('div','row');
+  row.appendChild(el('div',null,'Кнопка '+(i+1)));
+  const combo=el('div','combo');
+  const inp=document.createElement('input');
+  inp.value=name; inp.autocomplete='off'; inp.id='bi'+i;
+  const drop=el('div','drop');
+  combo.append(inp,drop);
+  row.appendChild(combo);
+
+  const paint=q=>{
+    drop.textContent='';
+    const ql=q.trim().toLowerCase();
+    CATALOG.forEach((c,j)=>{
+      if(ql && !c.n.toLowerCase().includes(ql)) return;
+      const d=document.createElement('div');
+      d.appendChild(el('span','tag',c.m?'мышь':'клавиша'));
+      d.appendChild(document.createTextNode(c.n));
+      d.addEventListener('pointerdown',e=>{e.preventDefault();pick(j);});
+      drop.appendChild(d);
+    });
+  };
+  const show=()=>drop.style.display='block';
+  const hide=()=>drop.style.display='none';
+  const pick=j=>{
+    inp.value=CATALOG[j].n;
+    IDX[i]=j;
+    inp.classList.remove('err');
+    hide();
+  };
+  inp.addEventListener('focus',()=>{paint(inp.value);show();});
+  inp.addEventListener('input',()=>{paint(inp.value);show();});
+  inp.addEventListener('blur',()=>setTimeout(hide,180));
+  inp.addEventListener('keydown',e=>{
+    if(e.key==='Enter'){
+      e.preventDefault();
+      const ql=inp.value.trim().toLowerCase();
+      const hit=CATALOG.findIndex(c=>c.n.toLowerCase().includes(ql));
+      if(hit>=0) pick(hit); else inp.classList.add('err');
+    }
+  });
+  return row;
+}
+
+async function save(e){
+  e.preventDefault();
+  const fd=new URLSearchParams();
+  for(let i=0;i<8;i++){
+    const inp=$('bi'+i);
+    const j=NAMEBY[inp.value.trim()];
+    if(j===undefined){
+      inp.classList.add('err');
+      overlay('Неизвестное действие «'+inp.value+'» в кнопке '+(i+1));
+      return false;
+    }
+    fd.append('b'+(i+1),j);
+  }
+  const ssid=$('ssid').value.trim();
+  if(ssid){
+    fd.append('ssid',ssid);
+    fd.append('pass',$('pass').value);
+  }
+  try{
+    const r=await fetch('/save',{method:'POST',body:fd});
+    if(!r.ok){ overlay('Плата отказала: HTTP '+r.status+'. '+(await r.text()).replace(/<[^>]*>/g,' ').trim()); return false; }
+  }catch(err){
+    // плата ушла в перезагрузку, не успев дочитать ответ, — сохранение прошло
+  }
+  overlay('Сохранено. Плата перезагружается в рабочий режим, портал сейчас закроется.');
+  return false;
+}
+
+async function reboot(e){
+  e.preventDefault();
+  overlay('Перезагрузка…');
+  try{ await fetch('/reboot'); }catch(err){}
+  return false;
+}
+
+function overlay(t){
+  $('ovtext').textContent=t;
+  $('overlay').style.display='flex';
+}
+
+init();
+</script>
+</body>
+</html>
