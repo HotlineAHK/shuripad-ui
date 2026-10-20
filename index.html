@@ -35,8 +35,14 @@ h2{font-size:.95rem;margin:0}
 .spin{display:inline-block;width:1.25em;color:var(--blue)}
 .spin.ok{color:var(--green)}
 
-.pills{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 2px}
-.pill{display:inline-flex;align-items:center;gap:7px;background:var(--panel2);border:1px solid var(--border);border-radius:99px;padding:4px 11px;font-size:.76rem;color:var(--dim)}
+.facts{margin:12px 0 2px;border:1px solid var(--border);border-radius:12px;background:var(--panel);overflow:hidden}
+.fact{display:grid;grid-template-columns:18px auto 1fr;gap:10px;align-items:center;padding:9px 13px;border-top:1px solid var(--border)}
+.fact:first-child{border-top:0}
+.fact svg{width:15px;height:15px;display:block;color:var(--dimmer)}
+.fact svg.ok{color:var(--green)}
+.fact svg.bl{color:var(--blue)}
+.fact .fl{font-size:.78rem;color:var(--dimmer)}
+.fact .fv{font:.78rem var(--mono);color:var(--text);text-align:right;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dot{width:7px;height:7px;border-radius:50%;background:var(--dimmer);flex:none}
 .dot.g{background:var(--green);box-shadow:0 0 8px rgba(65,196,99,.7)}
 .dot.b{background:var(--blue);box-shadow:0 0 8px rgba(77,141,255,.7)}
@@ -87,7 +93,7 @@ button.primary:active{filter:brightness(.85);transform:scale(.985)}
 <body>
 <header><div class="logo">⌗</div><h1>shuri-pad</h1></header>
 <div id="statusline"><span id="spin" class="spin">⠋</span><span id="stext">подключаюсь к плате…</span></div>
-<div id="pills" class="pills"></div>
+<div id="facts"></div>
 
 <form onsubmit="return save(event)">
 <div class="card">
@@ -116,7 +122,7 @@ button.primary:active{filter:brightness(.85);transform:scale(.985)}
 
 <script>
 let CATALOG=[],NAMEBY={},ORIG=[0,0,0,0,0,0,0,0],IDX=[0,0,0,0,0,0,0,0],NUMS=[];
-let DEMO=false,busy=false,spinT=null,readyStatus='';
+let DEMO=false,busy=false,spinT=null,readyStatus='',holdUntil=0;
 const FRAMES='⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏',DEFAULTS=['LMB','RMB','F5','Q','Space','LShift','LCtrl','F1'];
 const $=id=>document.getElementById(id);
 const el=(t,c,txt)=>{const d=document.createElement(t);if(c)d.className=c;if(txt!==undefined)d.textContent=txt;return d};
@@ -134,6 +140,7 @@ function setBusy(b,text){
 }
 const fmtUp=s=>{s=+s||0;const m=Math.floor(s/60),h=Math.floor(m/60);
   return h?h+'ч '+(m%60)+'м':(m?m+'м '+(s%60)+'с':s+'с')};
+function notice(text){holdUntil=Date.now()+3500;setBusy(false,text);}
 
 function demoState(){
   const c=[['LMB',1],['RMB',1],['MMB',1]].map(x=>({n:x[0],m:x[1]}));
@@ -148,12 +155,12 @@ function demoState(){
 
 async function init(){
   let S;
-  try{S=await(await fetch('/api/state')).json();}
+  try{S=await(await fetch('/api/state',{cache:'no-store'})).json();}
   catch(e){DEMO=true;S=demoState();}
   CATALOG=S.catalog;
   CATALOG.forEach((c,i)=>NAMEBY[c.n]=i);
   for(let i=0;i<8;i++){IDX[i]=S.b[i];ORIG[i]=S.b[i];}
-  pills(S);
+  facts(S);
   const rows=$('rows');
   for(let i=0;i<8;i++)rows.appendChild(makeRow(i,S.names[i]));
   const g=$('padgrid');
@@ -162,21 +169,38 @@ async function init(){
     setBusy(false,'демо-просмотр · плата не отвечает');
     $('livetext').textContent='демо';
   }else{
-    readyStatus='готово · '+CATALOG.length+' действий · RAM '+Math.round(S.heap/1024)+' КБ · '+fmtUp(S.up);
+    readyStatus=statusText(S);
     setBusy(false,readyStatus);
     startPoll();
   }
 }
 
-function pills(S){
-  const P=$('pills');
-  const add=(cls,txt,mono)=>{const p=el('span','pill');
-    if(cls)p.appendChild(el('span','dot '+cls));
-    p.appendChild(el('span',mono?'mono':null,txt));P.appendChild(p);};
-  add(S.sta?'g':null,S.sta?'домашняя сеть':'только точка доступа');
-  add('b','AP '+S.apip,true);
-  if(S.ip)add(null,'WiFi '+S.ip,true);
-  add(null,S.ssid?'SSID: '+S.ssid:'WiFi не настроен');
+const plural=(n,f)=>{n=Math.abs(n)%100;const d=n%10;if(n>10&&n<20)return f[2];if(d>1&&d<5)return f[1];if(d===1)return f[0];return f[2]};
+const statusText=S=>'готово · '+CATALOG.length+' '+plural(CATALOG.length,['действие','действия','действий'])+' · '+fmtUp(S.up);
+
+// inline SVG в стиле Material Symbols: внешний шрифт иконок в AP-режиме недоступен (нет интернета)
+const ICONS={
+  wifi:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>',
+  ap:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 11c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 2c0-3.31-2.69-6-6-6s-6 2.69-6 6c0 2.22 1.2 4.15 3 5.19l1-1.74c-1.19-.7-2-1.97-2-3.45 0-2.21 1.79-4 4-4s4 1.79 4 4c0 1.48-.81 2.75-2 3.45l1 1.74c1.8-1.04 3-2.97 3-5.19zM12 3C6.48 3 2 7.48 2 13c0 3.7 2.01 6.92 4.99 8.65l1-1.73C5.61 18.53 4 15.96 4 13c0-4.42 3.58-8 8-8s8 3.58 8 8c0 2.96-1.61 5.53-4 7.92l1 1.73c2.99-1.73 5-4.95 5-8.65 0-5.52-4.48-10-10-10z"/></svg>',
+  link:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>',
+  ram:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M15 9H9v6h6V9zm-2 4h-2v-2h2v2zm8-2V9h-2V7c0-1.1-.9-2-2-2h-2V3h-2v2h-2V3H9v2H7c-1.1 0-2 .9-2 2v2H3v2h2v2H3v2h2v2c0 1.1.9 2 2 2h2v2h2v-2h2v2h2v-2h2c1.1 0 2-.9 2-2v-2h2v-2h-2v-2h2zm-4 6H7V7h10v10z"/></svg>'
+};
+
+/* блок фактов: ровные строки «иконка · подпись · значение» вместо чипов разной ширины */
+function facts(S){
+  const P=$('facts');P.textContent='';
+  const row=(ic,cls,label,value)=>{
+    const r=el('div','fact');
+    r.innerHTML=ICONS[ic];
+    if(cls)r.querySelector('svg').classList.add(cls);
+    r.appendChild(el('span','fl',label));
+    r.appendChild(el('span','fv',value));
+    P.appendChild(r);
+  };
+  row('wifi',S.sta?'ok':'','WiFi',S.sta?((S.ssid||'?')+' · '+S.ip):'не подключено');
+  row('ap','bl','точка доступа','shuripad · '+S.apip);
+  if(S.sta)row('link','','страница','shuripad.local');
+  row('ram','','RAM',Math.round((S.heap||0)/1024)+' КБ');
 }
 
 function paintNums(){
@@ -233,8 +257,7 @@ function resetDefaults(){
     if(j!==undefined){inp.value=n;inp.classList.remove('err');IDX[i]=j;}
   });
   paintNums();
-  setBusy(false,'биндинги сброшены к дефолтам — не забудь «Сохранить»');
-  setTimeout(()=>{if(!busy)setBusy(false,readyStatus);},3500);
+  notice('биндинги сброшены к дефолтам — не забудь «Сохранить»');
 }
 
 /* живой опрос состояния кнопок (3 раза в секунду) */
@@ -242,10 +265,11 @@ function startPoll(){
   let fails=0;
   const t=setInterval(async()=>{
     try{
-      const r=await fetch('/api/state');
+      const r=await fetch('/api/state',{cache:'no-store'});
       if(!r.ok)throw 0;
       const s=await r.json();
       document.querySelectorAll('#padgrid .cell').forEach((c,i)=>c.classList.toggle('on',!!s.keys[i]));
+      if(s.heap&&s.up!==undefined){readyStatus=statusText(s);if(!busy&&Date.now()>holdUntil)setBusy(false,readyStatus);}
       fails=0;$('livedot').className='dot g';$('livetext').textContent='живой опрос';
     }catch(e){
       document.querySelectorAll('#padgrid .cell').forEach(c=>c.classList.remove('on'));
